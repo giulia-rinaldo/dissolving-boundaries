@@ -1,0 +1,120 @@
+@font-face {
+  font-family: 'Fragment Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: url(https://fonts.gstatic.com/s/fragmentmono/v6/4iCr6K5wfMRRjxp0DA6-2CLnB4NHhqcL71Q.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+body {
+  margin: 0;
+  font-family: 'Fragment Mono', monospace;
+  font-size: 12px; /* piccolo */
+  background: #fff;
+  color: #000;
+  padding-bottom: 25px; /* aggiunge spazio bianco sotto */
+}
+
+.controls {
+  padding: 16px;
+}
+
+.nav-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 12px;
+  padding: 10px;
+  margin-bottom: 50px;
+}
+
+.nav-item {
+  font-family: 'Fragment Mono', monospace;
+  font-size: 12px;
+  text-align: left;
+}
+
+/* stile dei link dentro nav-item */
+.nav-item a {
+  text-decoration: none;  /* niente sottolineatura */
+  color: #000;            /* nero di default */
+}
+
+/* hover blu elettrico */
+.nav-item a:hover {
+  color: #0d5bff;
+}
+
+button {
+  font-family: 'Fragment Mono', monospace;
+  font-size: 11px;
+  background: none;
+  border: 1px solid #000;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+/* Stile invertito per HIDE */
+button.hide-mode {
+  background: #000;
+  color: #fff;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(8, 8fr);
+  column-gap: 12px;   /* spazio orizzontale */
+  row-gap: 300px;      /* spazio verticale tra le righe */
+  padding: 16px;
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+}
+
+.number {
+  font-family: 'Fragment Mono', monospace;
+  font-size: 10px;
+  color: #777;
+  margin-bottom: 2px;
+}
+
+.content {
+  position: relative;
+  width: 100%;
+}
+
+.text {
+  font-size: 11px;          /* più piccolo */
+  top: 15px;
+  line-height: 1;         /* interlinea compatta */
+  text-align: left;
+  white-space: pre-line;
+  position: relative;
+  z-index: 1;               /* livello sotto */
+}
+
+.content img {
+  width: 100%;
+  position: absolute;       /* immagine sopra */
+  top: 15px;
+  left: 0;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+/* VIEW ALL: immagini visibili solo su hover */
+.view-all .content img {
+  opacity: 0;
+}
+.view-all .content img:hover {
+  opacity: 1;
+}
+
+/* HIDE: tutte le immagini visibili */
+.hide .content img {
+  opacity: 1;
+}
