@@ -10,14 +10,14 @@ toggle.addEventListener('click', () => {
   toggle.setAttribute('aria-pressed', String(!pressed));
 
   if (!pressed) {
-    // VIEW ALL mode
+    // VIEW ALL mode → tutte le foto visibili, bottone bianco
     grid.classList.remove('hide');
     grid.classList.add('view-all');
-    toggle.classList.remove('hide-mode'); // bottone normale
+    toggle.classList.remove('all-mode');
   } else {
-    // HIDE mode
+    // HIDE mode → bottone nero
     grid.classList.remove('view-all');
     grid.classList.add('hide');
-    toggle.classList.add('hide-mode'); // bottone invertito
+    toggle.classList.add('all-mode');
   }
 });

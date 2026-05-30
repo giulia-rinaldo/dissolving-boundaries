@@ -44,6 +44,15 @@ body {
   color: #0d5bff;
 }
 
+/* simboli freccia: piccola animazione all'hover, ognuno nella sua direzione */
+.nav-symbol {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+.nav-item a:hover .nav-symbol.down  { transform: translateY(4px); }
+.nav-item a:hover .nav-symbol.up    { transform: translateY(-4px); }
+.nav-item a:hover .nav-symbol.right { transform: translateX(4px); }
+
 .toggle-text {
   font-family: 'Fragment Mono', monospace;
   font-size: 11px;
@@ -106,4 +115,16 @@ body {
 }
 .cell-verywide {
   grid-column: span 3;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .nav-grid { grid-template-columns: repeat(4, 1fr); }
+  .grid { grid-template-columns: repeat(4, 1fr); row-gap: 60px; }
+  .cell-verywide, .cell-wide { grid-column: span 4; }
+}
+@media (max-width: 600px) {
+  .nav-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 30px; }
+  .grid { grid-template-columns: 1fr; row-gap: 24px; }
+  .cell-verywide, .cell-wide { grid-column: auto; }
 }

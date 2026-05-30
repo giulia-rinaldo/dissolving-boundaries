@@ -44,6 +44,15 @@ body {
   color: #0d5bff;
 }
 
+/* simboli freccia: piccola animazione all'hover, ognuno nella sua direzione */
+.nav-symbol {
+  display: inline-block;
+  transition: transform 0.2s ease;
+}
+.nav-item a:hover .nav-symbol.down  { transform: translateY(4px); }
+.nav-item a:hover .nav-symbol.up    { transform: translateY(-4px); }
+.nav-item a:hover .nav-symbol.right { transform: translateX(4px); }
+
 .toggle-text {
   font-family: 'Fragment Mono', monospace;
   font-size: 11px;
@@ -108,4 +117,71 @@ body {
 }
 .cell-verywide {
   grid-column: span 3;
+}
+
+/* ===== LIGHTBOX ===== */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: pointer;
+}
+.lightbox[hidden] { display: none; }
+
+.lightbox-content {
+  display: inline-block;
+  cursor: default;
+}
+.lightbox-img {
+  display: block;
+  max-width: 90vw;
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+}
+/* rettangolo nero largo come l'immagine, testo bianco */
+.lightbox-caption {
+  background: #000;
+  color: #fff;
+  font-family: 'Fragment Mono', monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  padding: 12px 14px;
+  box-sizing: border-box;
+}
+.lightbox-caption:empty { display: none; }
+.lightbox-caption i { font-style: italic; }
+.lightbox-number { margin-bottom: 8px; }
+
+/* animazione zoom all'apertura del lightbox */
+.lightbox:not([hidden]) .lightbox-content {
+  animation: lightbox-zoom 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes lightbox-zoom {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* nome artista nel lightbox */
+.lightbox-artist {
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .nav-grid { grid-template-columns: repeat(4, 1fr); }
+  .grid { grid-template-columns: repeat(4, 1fr); row-gap: 120px; }
+  .cell-verywide { grid-column: span 4; }
+  .cell-wide { grid-column: span 2; }
+}
+@media (max-width: 600px) {
+  .nav-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 30px; }
+  .grid { grid-template-columns: repeat(2, 1fr); row-gap: 60px; column-gap: 10px; }
+  .cell-verywide, .cell-wide { grid-column: span 2; }
+  .lightbox-img { max-height: 70vh; }
 }
