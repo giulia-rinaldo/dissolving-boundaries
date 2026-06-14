@@ -20,18 +20,20 @@ body {
 }
 
 .nav-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 12px;
-  padding: 10px;
-  margin-bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;   /* in alto a destra */
+  gap: 4px;
+  padding: 12px 16px;
+  margin-bottom: 40px;
 }
 
 .nav-item {
   font-family: 'Fragment Mono', monospace;
   font-size: 12px;
-  text-align: left;
+  text-align: right;
 }
+.nav-item:empty { display: none; }   /* nasconde le celle vuote */
 
 /* stile dei link dentro nav-item */
 .nav-item a {
@@ -70,6 +72,8 @@ body {
   column-gap: 12px;   /* spazio orizzontale */
   row-gap: 300px;      /* spazio verticale tra le righe */
   padding: 16px;
+  box-sizing: border-box;  /* resta dentro la larghezza della slide */
+  width: 100%;
 }
 
 .cell {
@@ -184,4 +188,77 @@ body {
   .grid { grid-template-columns: repeat(2, 1fr); row-gap: 60px; column-gap: 10px; }
   .cell-verywide, .cell-wide { grid-column: span 2; }
   .lightbox-img { max-height: 70vh; }
+}
+
+/* selezione testo: testo bianco, sfondo blu come l'hover */
+::selection {
+  background: #0d5bff;
+  color: #fff;
+}
+::-moz-selection {
+  background: #0d5bff;
+  color: #fff;
+}
+
+/* ===== SLIDER INTERPRETAZIONI ===== */
+.slider { position: relative; }
+
+.slides {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;            /* Firefox */
+}
+.slides::-webkit-scrollbar { display: none; }  /* Chrome/Safari */
+
+.slide {
+  flex: 0 0 100%;
+  width: 100%;
+  box-sizing: border-box;
+  scroll-snap-align: start;
+}
+
+/* frecce di navigazione */
+.slide-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Fragment Mono', monospace;
+  font-size: 14px;
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  padding: 8px 12px;
+  cursor: pointer;
+  z-index: 50;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.slide-arrow.prev { left: 12px; }
+.slide-arrow.next { right: 12px; }
+.slide-arrow:hover { background: #000; color: #fff; }
+
+/* puntini */
+.slide-dots {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px 16px 8px;
+}
+.slide-dots button {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 1px solid #000;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+}
+.slide-dots button.active { background: #000; }
+
+@media (max-width: 600px) {
+  .slide-arrow { padding: 6px 9px; font-size: 12px; }
+  .slide-arrow.prev { left: 6px; }
+  .slide-arrow.next { right: 6px; }
 }

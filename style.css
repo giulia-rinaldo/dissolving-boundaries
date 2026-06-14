@@ -20,18 +20,20 @@ body {
 }
 
 .nav-grid {
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  gap: 12px;
-  padding: 10px;
-  margin-bottom: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;   /* in alto a destra */
+  gap: 4px;
+  padding: 12px 16px;
+  margin-bottom: 40px;
 }
 
 .nav-item {
   font-family: 'Fragment Mono', monospace;
   font-size: 12px;
-  text-align: left;
+  text-align: right;
 }
+.nav-item:empty { display: none; }   /* nasconde le celle vuote */
 
 /* stile dei link dentro nav-item */
 .nav-item a {
@@ -202,4 +204,14 @@ button.all-mode:hover {
   .nav-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 30px; }
   .grid { grid-template-columns: repeat(2, 1fr); column-gap: 10px; }
   .lightbox-img { max-height: 70vh; }
+}
+
+/* selezione testo: testo bianco, sfondo blu come l'hover */
+::selection {
+  background: #0d5bff;
+  color: #fff;
+}
+::-moz-selection {
+  background: #0d5bff;
+  color: #fff;
 }
