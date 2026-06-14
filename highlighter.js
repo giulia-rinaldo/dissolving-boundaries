@@ -1,103 +1,116 @@
 // Evidenziatore per la pagina paper.
-// Due strumenti: cursore (selezione testo normale) ed evidenziatore (tratto a mano libera).
-// In modalità evidenziatore si disegna un tratto giallo che SEGUE IL MOUSE (non le righe del testo).
-// I tratti sono salvati in localStorage (per browser/dispositivo) e ricaricati alla visita successiva.
+// Due strumenti: cursore normale ed evidenziatore.
+// Le frasi evidenziate vengono salvate in localStorage (per browser/dispositivo)
+// e ricaricate alla visita successiva. Avvolge il testo in <mark> per un effetto pennarello.
 (function () {
-  const STORAGE_KEY = 'paper-strokes-v1';
-  const COLOR = '#e8ff00';
-  const SVGNS = 'http://www.w3.org/2000/svg';
-  const WIDTH = 16;
+  const STORAGE_KEY = 'paper-highlights-v1';
 
-  let strokes = load();   // [{ points: [[x, y], ...] }]
+  // blocchi di testo evidenziabili (con contenuto)
+  const blocks = Array.from(document.querySelectorAll('.text'))
+    .filter(function (b) { return b.textContent.trim().length > 0; });
+  const blockIndex = new Map();
+  blocks.forEach(function (b, i) { blockIndex.set(b, i); });
+
+  let records = load();   // [{ block, start, end, text }]
   let mode = 'cursor';    // 'cursor' | 'marker'
 
+  // ---------- storage ----------
   function load() {
     try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
     catch (e) { return []; }
   }
-  function persist() { localStorage.setItem(STORAGE_KEY, JSON.stringify(strokes)); }
+  function persist() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+  }
 
-  // ---------- overlay SVG (tratto a mano libera) ----------
-  const canvas = document.createElementNS(SVGNS, 'svg');
-  canvas.setAttribute('class', 'hl-canvas');
-  document.body.appendChild(canvas);
+  // ---------- offset <-> range ----------
+  // costruisce un Range dato l'offset (in caratteri) dentro un blocco
+  function offsetsToRange(block, start, end) {
+    const range = document.createRange();
+    const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT, null);
+    let pos = 0, startSet = false, node;
+    while ((node = walker.nextNode())) {
+      const len = node.nodeValue.length;
+      if (!startSet && start <= pos + len) {
+        range.setStart(node, start - pos);
+        startSet = true;
+      }
+      if (startSet && end <= pos + len) {
+        range.setEnd(node, end - pos);
+        return range;
+      }
+      pos += len;
+    }
+    return null;
+  }
+  // calcola start/end (in caratteri) di una selezione rispetto al blocco
+  function selectionOffsets(block, range) {
+    const pre = document.createRange();
+    pre.selectNodeContents(block);
+    pre.setEnd(range.startContainer, range.startOffset);
+    const start = pre.toString().length;
+    const end = start + range.toString().length;
+    return { start: start, end: end };
+  }
 
-  function sizeCanvas() {
-    canvas.setAttribute('width', document.documentElement.scrollWidth);
-    canvas.setAttribute('height', document.documentElement.scrollHeight);
-  }
-  function pointsAttr(pts) {
-    return pts.map(function (p) { return p[0] + ',' + p[1]; }).join(' ');
-  }
-  function makeStrokeEl(pts) {
-    const pl = document.createElementNS(SVGNS, 'polyline');
-    pl.setAttribute('points', pointsAttr(pts));
-    pl.setAttribute('fill', 'none');
-    pl.setAttribute('stroke', COLOR);
-    pl.setAttribute('stroke-width', WIDTH);
-    pl.setAttribute('stroke-linecap', 'round');
-    pl.setAttribute('stroke-linejoin', 'round');
-    pl.setAttribute('opacity', '0.55');
-    return pl;
-  }
-  function renderStrokes() {
-    sizeCanvas();
-    while (canvas.firstChild) canvas.removeChild(canvas.firstChild);
-    strokes.forEach(function (s) {
-      if (s.points && s.points.length) canvas.appendChild(makeStrokeEl(s.points));
+  // ---------- rendering (avvolge il testo in <mark> per l'effetto pennarello) ----------
+  // rimuove tutti i <mark> e ripristina il testo originale
+  function cleanMarks() {
+    document.querySelectorAll('mark.hl').forEach(function (m) {
+      const parent = m.parentNode;
+      while (m.firstChild) parent.insertBefore(m.firstChild, m);
+      parent.removeChild(m);
+      parent.normalize();
     });
   }
-  function render() { renderStrokes(); updatePanel(); }
-
-  // ---------- disegno (solo in modalità evidenziatore) ----------
-  let drawing = false, current = null, currentEl = null;
-  function toPoint(e) {
-    return [Math.round(e.clientX + window.scrollX), Math.round(e.clientY + window.scrollY)];
-  }
-  function onDown(e) {
-    if (mode !== 'marker') return;
-    if (e.target && e.target.closest && e.target.closest('.hl-toolbar, .hl-panel')) return;
-    if (e.button != null && e.button !== 0) return;
-    e.preventDefault();                       // niente selezione: solo tratto a mano libera
-    drawing = true;
-    current = { points: [toPoint(e)] };
-    currentEl = makeStrokeEl(current.points);
-    canvas.appendChild(currentEl);
-  }
-  function onMove(e) {
-    if (!drawing) return;
-    const p = toPoint(e);
-    const last = current.points[current.points.length - 1];
-    if (last[0] === p[0] && last[1] === p[1]) return;
-    current.points.push(p);
-    currentEl.setAttribute('points', pointsAttr(current.points));
-  }
-  function onUp() {
-    if (!drawing) return;
-    drawing = false;
-    if (current.points.length === 1) {        // semplice click → puntino
-      const p = current.points[0];
-      current.points.push([p[0] + 0.1, p[1]]);
-      currentEl.setAttribute('points', pointsAttr(current.points));
+  // avvolge un Range in un <mark>, anche se attraversa tag inline (<i>, <u>, ...)
+  function wrapRange(range) {
+    const mark = document.createElement('mark');
+    mark.className = 'hl';
+    try {
+      range.surroundContents(mark);
+    } catch (e) {
+      mark.appendChild(range.extractContents());
+      range.insertNode(mark);
     }
-    strokes.push(current);
-    persist();
-    current = null;
-    currentEl = null;
+  }
+  function render() {
+    cleanMarks();
+    records.forEach(function (r) {
+      const block = blocks[r.block];
+      if (!block) return;
+      const range = offsetsToRange(block, r.start, r.end);
+      if (range) { try { wrapRange(range); } catch (e) {} }
+    });
     updatePanel();
   }
-  document.addEventListener('mousedown', onDown);
-  document.addEventListener('mousemove', onMove);
-  document.addEventListener('mouseup', onUp);
-  window.addEventListener('resize', sizeCanvas);
 
-  function removeAt(i) { strokes.splice(i, 1); persist(); render(); }
-  function clearAll() { strokes = []; persist(); render(); }
+  // ---------- aggiungi dalla selezione ----------
+  function addFromSelection() {
+    const sel = window.getSelection();
+    if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    const start = range.startContainer.parentElement;
+    const block = start ? start.closest('.text') : null;
+    if (!block || !blockIndex.has(block)) return;           // solo dentro il testo
+    if (!block.contains(range.endContainer)) return;        // selezione in un solo blocco
+    const off = selectionOffsets(block, range);
+    if (off.end <= off.start) return;
+    const text = range.toString().replace(/\s+/g, ' ').trim();
+    if (!text) return;
+    records.push({ block: blockIndex.get(block), start: off.start, end: off.end, text: text });
+    persist();
+    render();
+    sel.removeAllRanges();
+  }
+
+  function removeAt(i) { records.splice(i, 1); persist(); render(); }
+  function clearAll() { records = []; persist(); render(); }
 
   // ---------- UI ----------
   // icone SVG (seguono il colore del bottone tramite currentColor)
   const ICON_CURSOR = '<svg class="hl-ico hl-ico-cursor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v10"/><path d="M10 7h4"/><path d="M10 17h4"/></svg>';
-  const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
+  const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
   const ICON_BOOKMARK = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
   const ICON_TRASH = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>';
 
@@ -106,7 +119,7 @@
   bar.innerHTML =
     '<button class="hl-btn hl-cursor active" title="Select text" aria-label="Select text">' + ICON_CURSOR + '</button>' +
     '<button class="hl-btn hl-marker" title="Highlighter" aria-label="Highlighter">' + ICON_MARKER + '</button>' +
-    '<button class="hl-btn hl-panel-toggle" title="Highlights" aria-label="Highlights">' + ICON_BOOKMARK + '<span class="hl-count">0</span></button>';
+    '<button class="hl-btn hl-panel-toggle" title="Saved highlights" aria-label="Saved highlights">' + ICON_BOOKMARK + '<span class="hl-count">0</span></button>';
   document.body.appendChild(bar);
 
   const panel = document.createElement('div');
@@ -122,11 +135,11 @@
   const GHOSTS = {
     cursor: {
       svg: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14"/><path d="M9.5 5h5"/><path d="M9.5 19h5"/></svg>',
-      ox: 13, oy: 13
+      ox: 13, oy: 13   // punto d'inserimento al centro
     },
     marker: {
-      svg: '<svg width="30" height="30" viewBox="0 0 24 24" fill="#e8ff00" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>',
-      ox: 4, oy: 25
+      svg: '<svg width="30" height="30" viewBox="0 0 24 24" fill="#e8ff00" stroke="#000" stroke-width="1.05" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>',
+      ox: 4, oy: 25    // punta in basso a sinistra
     }
   };
   const ghost = document.createElement('div');
@@ -145,7 +158,7 @@
 
   function moveGhost(e) {
     const t = e.target;
-    if (t && t.closest && t.closest('.hl-toolbar, .hl-panel')) { ghost.hidden = true; return; }
+    if (t && t.closest && t.closest('.hl-toolbar, .hl-panel, .nav-grid')) { ghost.hidden = true; return; }
     ghost.hidden = false;
     ghost.style.left = (e.clientX - ghostOX) + 'px';
     ghost.style.top = (e.clientY - ghostOY) + 'px';
@@ -172,23 +185,23 @@
   panel.querySelector('.hl-clear').addEventListener('click', clearAll);
 
   function updatePanel() {
-    countEl.textContent = strokes.length;
+    countEl.textContent = records.length;
     listEl.innerHTML = '';
-    if (!strokes.length) {
+    if (!records.length) {
       const li = document.createElement('li');
       li.className = 'hl-empty';
       li.textContent = 'No highlights yet.';
       listEl.appendChild(li);
       return;
     }
-    strokes.forEach(function (s, i) {
+    records.forEach(function (r, i) {
       const li = document.createElement('li');
       const span = document.createElement('span');
       span.className = 'hl-text';
-      span.textContent = 'Highlight ' + (i + 1);
+      span.textContent = r.text.length > 90 ? r.text.slice(0, 90) + '…' : r.text;
       span.addEventListener('click', function () {
-        const y = s.points && s.points[0] ? s.points[0][1] : 0;
-        window.scrollTo({ top: Math.max(0, y - 120), behavior: 'smooth' });
+        const block = blocks[r.block];
+        if (block) block.scrollIntoView({ behavior: 'smooth', block: 'center' });
       });
       const rm = document.createElement('button');
       rm.className = 'hl-remove';
@@ -200,6 +213,11 @@
       listEl.appendChild(li);
     });
   }
+
+  // evidenzia al rilascio della selezione, solo in modalità evidenziatore
+  function maybeAdd() { if (mode === 'marker') setTimeout(addFromSelection, 0); }
+  document.addEventListener('mouseup', maybeAdd);
+  document.addEventListener('touchend', maybeAdd);
 
   render();
 })();

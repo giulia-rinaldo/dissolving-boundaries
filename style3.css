@@ -220,7 +220,8 @@ body.hl-marker ::-moz-selection { background: #e8ff00; color: #000; }
 /* nascondo il cursore di sistema su tutta la pagina: lo sostituisce il ghost,
    sempre visibile una volta scelto lo strumento (tranne sopra barra e pannello) */
 body { cursor: none; }
-.hl-toolbar, .hl-panel { cursor: auto; }
+.hl-toolbar, .hl-panel, .nav-grid { cursor: auto; }
+.nav-grid a { cursor: pointer; }
 .hl-ghost {
   position: fixed;
   left: 0;
@@ -231,17 +232,6 @@ body { cursor: none; }
 }
 .hl-ghost svg { display: block; }
 .hl-ghost[hidden] { display: none; }
-
-/* overlay del tratto a mano libera: sopra il testo, non intercetta i click */
-.hl-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  pointer-events: none;
-  z-index: 5;
-  mix-blend-mode: multiply;
-  overflow: visible;
-}
 
 /* pannello frasi salvate */
 .hl-panel {
