@@ -109,7 +109,7 @@
 
   // ---------- UI ----------
   // icone SVG (seguono il colore del bottone tramite currentColor)
-  const ICON_CURSOR = '<svg class="hl-ico hl-ico-cursor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15"/><path d="M8 5.5c1.6 1.4 6.4 1.4 8 0"/><path d="M8 18.5c1.6-1.4 6.4-1.4 8 0"/></svg>';
+  const ICON_CURSOR = '<svg class="hl-ico hl-ico-cursor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v10"/><path d="M10 7h4"/><path d="M10 17h4"/></svg>';
   const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
   const ICON_BOOKMARK = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
   const ICON_TRASH = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>';
@@ -135,7 +135,7 @@
   const ghost = document.createElement('div');
   ghost.className = 'hl-ghost';
   ghost.hidden = true;
-  ghost.innerHTML = '<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M3 27 6 19l5 5-3 3z" fill="#fff27a" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 19 19 6a3 3 0 0 1 4.2 0l.6.6a3 3 0 0 1 0 4.2L11 24z" fill="#fff27a" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+  ghost.innerHTML = '<svg width="30" height="30" viewBox="0 0 24 24" fill="#e8ff00" stroke="#000" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
   document.body.appendChild(ghost);
 
   function moveGhost(e) {
@@ -145,8 +145,8 @@
       return;
     }
     ghost.hidden = false;
-    ghost.style.left = (e.clientX - 3) + 'px';   // punta in basso a sinistra
-    ghost.style.top = (e.clientY - 27) + 'px';
+    ghost.style.left = (e.clientX - 4) + 'px';   // punta in basso a sinistra
+    ghost.style.top = (e.clientY - 25) + 'px';
   }
   document.addEventListener('mousemove', moveGhost);
   document.addEventListener('mouseleave', function () { ghost.hidden = true; });

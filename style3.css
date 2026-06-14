@@ -164,20 +164,21 @@ body {
 mark.hl {
   background: linear-gradient(
     104deg,
-    rgba(255, 242, 122, 0) 0.4%,
-    rgba(255, 242, 122, 0.85) 1.8%,
-    rgba(255, 242, 122, 0.85) 97%,
-    rgba(255, 242, 122, 0) 99%
+    rgba(232, 255, 0, 0) 0.4%,
+    rgba(232, 255, 0, 0.85) 1.8%,
+    rgba(232, 255, 0, 0.85) 97%,
+    rgba(232, 255, 0, 0) 99%
   );
   color: inherit;
-  border-radius: 0.45em 0.6em 0.5em 0.7em;
-  padding: 0.06em 0.2em;
-  margin: 0 -0.06em;
+  border-radius: 0;
+  /* niente padding verticale + margini negativi = nessuno spostamento del testo */
+  padding: 0 0.12em;
+  margin: 0 -0.12em;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
 
-/* barra strumenti — pill arrotondata e morbida */
+/* barra strumenti — angoli squadrati */
 .hl-toolbar {
   position: fixed;
   left: 16px;
@@ -187,7 +188,6 @@ mark.hl {
   z-index: 200;
   background: #fff;
   border: 1px solid #000;
-  border-radius: 999px;
   padding: 5px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
@@ -197,7 +197,6 @@ mark.hl {
   background: none;
   color: #000;
   border: none;
-  border-radius: 999px;
   height: 32px;
   padding: 0 11px;
   cursor: pointer;
@@ -209,14 +208,14 @@ mark.hl {
 }
 .hl-btn:hover,
 .hl-btn.active { background: #000; color: #fff; }
-.hl-marker.active { background: #fff27a; color: #000; }   /* evidenziatore attivo = giallo */
+.hl-marker.active { background: #e8ff00; color: #000; }   /* evidenziatore attivo = giallo */
 .hl-ico { display: block; width: 16px; height: 16px; }
-.hl-ico-cursor { width: 20px; height: 20px; }             /* cursore un po' più grande */
+.hl-ico-cursor { width: 18px; height: 18px; }             /* cursore un po' più grande */
 .hl-count { font-size: 11px; line-height: 1; padding-right: 2px; }
 
 /* in modalità evidenziatore: la selezione è gialla (anteprima) */
-body.hl-marker ::selection { background: #fff27a; color: #000; }
-body.hl-marker ::-moz-selection { background: #fff27a; color: #000; }
+body.hl-marker ::selection { background: #e8ff00; color: #000; }
+body.hl-marker ::-moz-selection { background: #e8ff00; color: #000; }
 
 /* nascondo il cursore di sistema e mostro la "penna" che segue il mouse */
 body.hl-marker { cursor: none; }
@@ -242,7 +241,6 @@ body.hl-marker { cursor: none; }
   overflow-y: auto;
   background: #fff;
   border: 1px solid #000;
-  border-radius: 16px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
   z-index: 200;
   font-family: 'Fragment Mono', monospace;
