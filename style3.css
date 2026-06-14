@@ -210,25 +210,25 @@ mark.hl {
 .hl-btn.active { background: #000; color: #fff; }
 .hl-marker.active { background: #e8ff00; color: #000; }   /* evidenziatore attivo = giallo */
 .hl-ico { display: block; width: 16px; height: 16px; }
-.hl-ico-cursor { width: 20px; height: 20px; }             /* cursore un po' più grande */
+.hl-ico-cursor { width: 24px; height: 24px; }             /* cursore più grande */
 .hl-count { font-size: 11px; line-height: 1; padding-right: 2px; }
 
 /* in modalità evidenziatore: la selezione è gialla (anteprima) */
 body.hl-marker ::selection { background: #e8ff00; color: #000; }
 body.hl-marker ::-moz-selection { background: #e8ff00; color: #000; }
 
-/* nascondo il cursore di sistema e mostro la "penna" che segue il mouse */
-body.hl-marker { cursor: none; }
+/* sul testo nascondo il cursore di sistema: lo sostituisce il ghost (entrambi gli strumenti) */
+.text { cursor: none; }
 .hl-toolbar, .hl-panel { cursor: auto; }
 .hl-ghost {
   position: fixed;
   left: 0;
   top: 0;
-  width: 30px;
-  height: 30px;
+  line-height: 0;
   pointer-events: none;
   z-index: 300;
 }
+.hl-ghost svg { display: block; }
 .hl-ghost[hidden] { display: none; }
 
 /* pannello frasi salvate */

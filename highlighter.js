@@ -109,8 +109,8 @@
 
   // ---------- UI ----------
   // icone SVG (seguono il colore del bottone tramite currentColor)
-  const ICON_CURSOR = '<svg class="hl-ico hl-ico-cursor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v10"/><path d="M10 7h4"/><path d="M10 17h4"/></svg>';
-  const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
+  const ICON_CURSOR = '<svg class="hl-ico hl-ico-cursor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v10"/><path d="M10 7h4"/><path d="M10 17h4"/></svg>';
+  const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
   const ICON_BOOKMARK = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
   const ICON_TRASH = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>';
 
@@ -131,22 +131,38 @@
     '<ul class="hl-list"></ul>';
   document.body.appendChild(panel);
 
-  // cursore personalizzato a forma di evidenziatore che segue il mouse (stile Figma)
+  // cursore personalizzato che segue il mouse (stile Figma), uno per ogni strumento
+  const GHOSTS = {
+    cursor: {
+      svg: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14"/><path d="M9.5 5h5"/><path d="M9.5 19h5"/></svg>',
+      ox: 13, oy: 13   // punto d'inserimento al centro
+    },
+    marker: {
+      svg: '<svg width="30" height="30" viewBox="0 0 24 24" fill="#e8ff00" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>',
+      ox: 4, oy: 25    // punta in basso a sinistra
+    }
+  };
   const ghost = document.createElement('div');
   ghost.className = 'hl-ghost';
   ghost.hidden = true;
-  ghost.innerHTML = '<svg width="30" height="30" viewBox="0 0 24 24" fill="#e8ff00" stroke="#000" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
   document.body.appendChild(ghost);
 
+  let ghostOX = 13, ghostOY = 13;
+  function applyGhostIcon(m) {
+    const g = GHOSTS[m] || GHOSTS.cursor;
+    ghost.innerHTML = g.svg;
+    ghostOX = g.ox;
+    ghostOY = g.oy;
+  }
+  applyGhostIcon(mode);
+
   function moveGhost(e) {
-    if (mode !== 'marker') { ghost.hidden = true; return; }
-    if (e.target && e.target.closest && e.target.closest('.hl-toolbar, .hl-panel')) {
-      ghost.hidden = true;
-      return;
-    }
+    const t = e.target;
+    const overText = t && t.closest && t.closest('.text') && !t.closest('.hl-toolbar, .hl-panel');
+    if (!overText) { ghost.hidden = true; return; }
     ghost.hidden = false;
-    ghost.style.left = (e.clientX - 4) + 'px';   // punta in basso a sinistra
-    ghost.style.top = (e.clientY - 25) + 'px';
+    ghost.style.left = (e.clientX - ghostOX) + 'px';
+    ghost.style.top = (e.clientY - ghostOY) + 'px';
   }
   document.addEventListener('mousemove', moveGhost);
   document.addEventListener('mouseleave', function () { ghost.hidden = true; });
@@ -162,7 +178,7 @@
     btnCursor.classList.toggle('active', m === 'cursor');
     btnMarker.classList.toggle('active', m === 'marker');
     document.body.classList.toggle('hl-marker', m === 'marker');
-    if (m !== 'marker') ghost.hidden = true;
+    applyGhostIcon(m);
   }
   btnCursor.addEventListener('click', function () { setMode('cursor'); });
   btnMarker.addEventListener('click', function () { setMode('marker'); });
