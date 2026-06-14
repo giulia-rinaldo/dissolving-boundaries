@@ -93,20 +93,26 @@
   function clearAll() { records = []; persist(); render(); }
 
   // ---------- UI ----------
+  // icone SVG (seguono il colore del bottone tramite currentColor)
+  const ICON_CURSOR = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M8 4h8"/><path d="M8 20h8"/></svg>';
+  const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.5-4L14 7.5 17.5 11 8 20.5z"/><path d="M14 7.5l2-2a2 2 0 0 1 3 0l.4.4a2 2 0 0 1 0 3l-2 2"/></svg>';
+  const ICON_BOOKMARK = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
+  const ICON_TRASH = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>';
+
   const bar = document.createElement('div');
   bar.className = 'hl-toolbar';
   bar.innerHTML =
-    '<button class="hl-btn hl-cursor active">CURSORE</button>' +
-    '<button class="hl-btn hl-marker">EVIDENZIA</button>' +
-    '<button class="hl-btn hl-panel-toggle">SALVATI (<span class="hl-count">0</span>)</button>';
+    '<button class="hl-btn hl-cursor active" title="Select text" aria-label="Select text">' + ICON_CURSOR + '</button>' +
+    '<button class="hl-btn hl-marker" title="Highlighter" aria-label="Highlighter">' + ICON_MARKER + '</button>' +
+    '<button class="hl-btn hl-panel-toggle" title="Saved highlights" aria-label="Saved highlights">' + ICON_BOOKMARK + '<span class="hl-count">0</span></button>';
   document.body.appendChild(bar);
 
   const panel = document.createElement('div');
   panel.className = 'hl-panel';
   panel.hidden = true;
   panel.innerHTML =
-    '<div class="hl-panel-head"><span>EVIDENZIATI</span>' +
-    '<button class="hl-clear">CANCELLA TUTTO</button></div>' +
+    '<div class="hl-panel-head">' + ICON_BOOKMARK +
+    '<button class="hl-clear" title="Clear all" aria-label="Clear all">' + ICON_TRASH + '</button></div>' +
     '<ul class="hl-list"></ul>';
   document.body.appendChild(panel);
 
@@ -133,7 +139,7 @@
     if (!records.length) {
       const li = document.createElement('li');
       li.className = 'hl-empty';
-      li.textContent = 'Nessuna frase evidenziata.';
+      li.textContent = 'No highlights yet.';
       listEl.appendChild(li);
       return;
     }
@@ -149,7 +155,7 @@
       const rm = document.createElement('button');
       rm.className = 'hl-remove';
       rm.textContent = '✕';
-      rm.setAttribute('aria-label', 'rimuovi');
+      rm.setAttribute('aria-label', 'remove');
       rm.addEventListener('click', function () { removeAt(i); });
       li.appendChild(span);
       li.appendChild(rm);
