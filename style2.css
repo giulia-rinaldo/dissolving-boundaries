@@ -262,3 +262,15 @@ body {
   .slide-arrow.prev { left: 6px; }
   .slide-arrow.next { right: 6px; }
 }
+
+/* mobile: titolo in alto a sinistra, menu (frecce) a destra */
+@media (max-width: 600px) {
+  .nav-grid { position: relative; }
+  .nav-grid .nav-item:first-child {
+    position: absolute;
+    top: 12px;
+    left: 16px;
+    max-width: 55%;
+    text-align: left;
+  }
+}

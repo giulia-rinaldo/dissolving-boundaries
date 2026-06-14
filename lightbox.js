@@ -25,6 +25,23 @@
     lbCaption.style.width = lbImg.offsetWidth + 'px';
   }
 
+  // link a una fonte attendibile (Wikipedia) per ogni artista
+  function artistHref(name) {
+    const n = name.toLowerCase();
+    if (n.indexOf('gallen-kallela') !== -1) return 'https://en.wikipedia.org/wiki/Akseli_Gallen-Kallela';
+    if (n.indexOf('saarinen') !== -1) return 'https://en.wikipedia.org/wiki/Eliel_Saarinen';
+    if (n.indexOf('sonck') !== -1) return 'https://en.wikipedia.org/wiki/Lars_Sonck';
+    if (n.indexOf('thom') !== -1) return 'https://en.wikipedia.org/wiki/Verner_Thom%C3%A9';
+    return null;
+  }
+  // restituisce il nome avvolto in un link (sottolineato) se disponibile
+  function artistHTML(name) {
+    const href = artistHref(name);
+    return href
+      ? '<a class="artist-link" href="' + href + '" target="_blank" rel="noopener">' + name + '</a>'
+      : name;
+  }
+
   function open(img) {
     const cell = img.closest('.cell');
     const number = cell ? cell.querySelector('.number') : null;
@@ -39,11 +56,11 @@
       if (number && number.textContent.trim()) {
         info += '<div class="lightbox-number">' + number.innerHTML + '</div>';
       }
-      info += '◼︎ ' + img.dataset.artist;
+      info += '◼︎ ' + artistHTML(img.dataset.artist);
     } else {
       // opere: nome dell'artista in tonde, poi le info
       if (img.dataset.artist) {
-        info += '<div class="lightbox-artist">( &nbsp;' + img.dataset.artist + '&nbsp; )</div>';
+        info += '<div class="lightbox-artist">( &nbsp;' + artistHTML(img.dataset.artist) + '&nbsp; )</div>';
       } else if (number && number.textContent.trim()) {
         info += '<div class="lightbox-number">' + number.innerHTML + '</div>';
       }
