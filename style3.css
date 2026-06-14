@@ -210,7 +210,7 @@ mark.hl {
 .hl-btn.active { background: #000; color: #fff; }
 .hl-marker.active { background: #e8ff00; color: #000; }   /* evidenziatore attivo = giallo */
 .hl-ico { display: block; width: 16px; height: 16px; }
-.hl-ico-cursor { width: 18px; height: 18px; }             /* cursore un po' più grande */
+.hl-ico-cursor { width: 20px; height: 20px; }             /* cursore un po' più grande */
 .hl-count { font-size: 11px; line-height: 1; padding-right: 2px; }
 
 /* in modalità evidenziatore: la selezione è gialla (anteprima) */
@@ -258,6 +258,7 @@ body.hl-marker { cursor: none; }
   top: 0;
   background: #fff;
 }
+.hl-panel-title { font-size: 11px; letter-spacing: 0.06em; }
 .hl-clear {
   background: none;
   border: 1px solid #000;
