@@ -94,8 +94,8 @@
 
   // ---------- UI ----------
   // icone SVG (seguono il colore del bottone tramite currentColor)
-  const ICON_CURSOR = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v16"/><path d="M8 4h8"/><path d="M8 20h8"/></svg>';
-  const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.5-4L14 7.5 17.5 11 8 20.5z"/><path d="M14 7.5l2-2a2 2 0 0 1 3 0l.4.4a2 2 0 0 1 0 3l-2 2"/></svg>';
+  const ICON_CURSOR = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M10 5h4"/><path d="M10 19h4"/></svg>';
+  const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
   const ICON_BOOKMARK = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
   const ICON_TRASH = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>';
 
@@ -116,6 +116,26 @@
     '<ul class="hl-list"></ul>';
   document.body.appendChild(panel);
 
+  // cursore personalizzato a forma di evidenziatore che segue il mouse (stile Figma)
+  const ghost = document.createElement('div');
+  ghost.className = 'hl-ghost';
+  ghost.hidden = true;
+  ghost.innerHTML = '<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"><path d="M3 27 6 19l5 5-3 3z" fill="#fff27a" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/><path d="M6 19 19 6a3 3 0 0 1 4.2 0l.6.6a3 3 0 0 1 0 4.2L11 24z" fill="#fff27a" stroke="#000" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+  document.body.appendChild(ghost);
+
+  function moveGhost(e) {
+    if (mode !== 'marker') { ghost.hidden = true; return; }
+    if (e.target && e.target.closest && e.target.closest('.hl-toolbar, .hl-panel')) {
+      ghost.hidden = true;
+      return;
+    }
+    ghost.hidden = false;
+    ghost.style.left = (e.clientX - 3) + 'px';   // punta in basso a sinistra
+    ghost.style.top = (e.clientY - 27) + 'px';
+  }
+  document.addEventListener('mousemove', moveGhost);
+  document.addEventListener('mouseleave', function () { ghost.hidden = true; });
+
   const btnCursor = bar.querySelector('.hl-cursor');
   const btnMarker = bar.querySelector('.hl-marker');
   const btnPanel = bar.querySelector('.hl-panel-toggle');
@@ -127,6 +147,7 @@
     btnCursor.classList.toggle('active', m === 'cursor');
     btnMarker.classList.toggle('active', m === 'marker');
     document.body.classList.toggle('hl-marker', m === 'marker');
+    if (m !== 'marker') ghost.hidden = true;
   }
   btnCursor.addEventListener('click', function () { setMode('cursor'); });
   btnMarker.addEventListener('click', function () { setMode('marker'); });

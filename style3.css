@@ -195,7 +195,20 @@ body {
 /* in modalità evidenziatore: la selezione è gialla (anteprima) */
 body.hl-marker ::selection { background: #fff27a; color: #000; }
 body.hl-marker ::-moz-selection { background: #fff27a; color: #000; }
-body.hl-marker .text { cursor: crosshair; }
+
+/* nascondo il cursore di sistema e mostro la "penna" che segue il mouse */
+body.hl-marker { cursor: none; }
+.hl-toolbar, .hl-panel { cursor: auto; }
+.hl-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+  z-index: 300;
+}
+.hl-ghost[hidden] { display: none; }
 
 /* pannello frasi salvate */
 .hl-panel {
