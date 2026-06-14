@@ -126,7 +126,7 @@
   panel.className = 'hl-panel';
   panel.hidden = true;
   panel.innerHTML =
-    '<div class="hl-panel-head"><span class="hl-panel-title">SAVED</span>' +
+    '<div class="hl-panel-head"><span class="hl-panel-title">HIGHLIGHTS</span>' +
     '<button class="hl-clear" title="Clear all" aria-label="Clear all">' + ICON_TRASH + '</button></div>' +
     '<ul class="hl-list"></ul>';
   document.body.appendChild(panel);
