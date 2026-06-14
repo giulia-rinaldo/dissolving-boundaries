@@ -217,8 +217,9 @@ mark.hl {
 body.hl-marker ::selection { background: #e8ff00; color: #000; }
 body.hl-marker ::-moz-selection { background: #e8ff00; color: #000; }
 
-/* sul testo nascondo il cursore di sistema: lo sostituisce il ghost (entrambi gli strumenti) */
-.text { cursor: none; }
+/* nascondo il cursore di sistema su tutta la pagina: lo sostituisce il ghost,
+   sempre visibile una volta scelto lo strumento (tranne sopra barra e pannello) */
+body { cursor: none; }
 .hl-toolbar, .hl-panel { cursor: auto; }
 .hl-ghost {
   position: fixed;

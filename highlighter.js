@@ -109,7 +109,7 @@
 
   // ---------- UI ----------
   // icone SVG (seguono il colore del bottone tramite currentColor)
-  const ICON_CURSOR = '<svg class="hl-ico hl-ico-cursor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v10"/><path d="M10 7h4"/><path d="M10 17h4"/></svg>';
+  const ICON_CURSOR = '<svg class="hl-ico hl-ico-cursor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v10"/><path d="M10 7h4"/><path d="M10 17h4"/></svg>';
   const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
   const ICON_BOOKMARK = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
   const ICON_TRASH = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>';
@@ -134,7 +134,7 @@
   // cursore personalizzato che segue il mouse (stile Figma), uno per ogni strumento
   const GHOSTS = {
     cursor: {
-      svg: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14"/><path d="M9.5 5h5"/><path d="M9.5 19h5"/></svg>',
+      svg: '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg"><path d="M12 5v14"/><path d="M9.5 5h5"/><path d="M9.5 19h5"/></svg>',
       ox: 13, oy: 13   // punto d'inserimento al centro
     },
     marker: {
@@ -158,8 +158,7 @@
 
   function moveGhost(e) {
     const t = e.target;
-    const overText = t && t.closest && t.closest('.text') && !t.closest('.hl-toolbar, .hl-panel');
-    if (!overText) { ghost.hidden = true; return; }
+    if (t && t.closest && t.closest('.hl-toolbar, .hl-panel')) { ghost.hidden = true; return; }
     ghost.hidden = false;
     ghost.style.left = (e.clientX - ghostOX) + 'px';
     ghost.style.top = (e.clientY - ghostOY) + 'px';
