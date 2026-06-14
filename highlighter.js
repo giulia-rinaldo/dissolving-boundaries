@@ -1,11 +1,9 @@
 // Evidenziatore per la pagina paper.
 // Due strumenti: cursore normale ed evidenziatore.
 // Le frasi evidenziate vengono salvate in localStorage (per browser/dispositivo)
-// e ricaricate alla visita successiva. Usa la CSS Custom Highlight API.
+// e ricaricate alla visita successiva. Avvolge il testo in <mark> per un effetto pennarello.
 (function () {
   const STORAGE_KEY = 'paper-highlights-v1';
-  const HL_NAME = 'saved-highlights';
-  const supported = typeof Highlight !== 'undefined' && window.CSS && CSS.highlights;
 
   // blocchi di testo evidenziabili (con contenuto)
   const blocks = Array.from(document.querySelectorAll('.text'))
@@ -55,18 +53,35 @@
     return { start: start, end: end };
   }
 
-  // ---------- rendering ----------
-  function render() {
-    if (supported) {
-      const hl = new Highlight();
-      records.forEach(function (r) {
-        const block = blocks[r.block];
-        if (!block) return;
-        const range = offsetsToRange(block, r.start, r.end);
-        if (range) hl.add(range);
-      });
-      CSS.highlights.set(HL_NAME, hl);
+  // ---------- rendering (avvolge il testo in <mark> per l'effetto pennarello) ----------
+  // rimuove tutti i <mark> e ripristina il testo originale
+  function cleanMarks() {
+    document.querySelectorAll('mark.hl').forEach(function (m) {
+      const parent = m.parentNode;
+      while (m.firstChild) parent.insertBefore(m.firstChild, m);
+      parent.removeChild(m);
+      parent.normalize();
+    });
+  }
+  // avvolge un Range in un <mark>, anche se attraversa tag inline (<i>, <u>, ...)
+  function wrapRange(range) {
+    const mark = document.createElement('mark');
+    mark.className = 'hl';
+    try {
+      range.surroundContents(mark);
+    } catch (e) {
+      mark.appendChild(range.extractContents());
+      range.insertNode(mark);
     }
+  }
+  function render() {
+    cleanMarks();
+    records.forEach(function (r) {
+      const block = blocks[r.block];
+      if (!block) return;
+      const range = offsetsToRange(block, r.start, r.end);
+      if (range) { try { wrapRange(range); } catch (e) {} }
+    });
     updatePanel();
   }
 
@@ -94,7 +109,7 @@
 
   // ---------- UI ----------
   // icone SVG (seguono il colore del bottone tramite currentColor)
-  const ICON_CURSOR = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M10 5h4"/><path d="M10 19h4"/></svg>';
+  const ICON_CURSOR = '<svg class="hl-ico hl-ico-cursor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.5v15"/><path d="M8 5.5c1.6 1.4 6.4 1.4 8 0"/><path d="M8 18.5c1.6-1.4 6.4-1.4 8 0"/></svg>';
   const ICON_MARKER = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>';
   const ICON_BOOKMARK = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
   const ICON_TRASH = '<svg class="hl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>';
@@ -188,12 +203,6 @@
   function maybeAdd() { if (mode === 'marker') setTimeout(addFromSelection, 0); }
   document.addEventListener('mouseup', maybeAdd);
   document.addEventListener('touchend', maybeAdd);
-
-  if (!supported) {
-    // fallback minimo: salva comunque, ma avvisa che l'evidenziazione visiva
-    // non è supportata da questo browser
-    console.warn('CSS Custom Highlight API non supportata: le frasi vengono salvate ma non colorate.');
-  }
 
   render();
 })();
